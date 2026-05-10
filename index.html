@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengujian Kadar CaCO₃ | Laboratorium Kimia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,700;9..144,900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            /* Light Theme Variables */
+            --bg:            #fafafa;
+            --bg-2:          #f4f4f5;
+            --surface:       #ffffff;
+            --surface-2:     #f8f8f9;
+            --surface-3:     #e4e4e7;
+            --border:        #e4e4e7;
+            --border-subtle: rgba(228, 228, 231, 0.7);
+
+            --blue:          #1d4ed8;
+            --blue-deep:     #1e40af;
+            --blue-muted:    rgba(29, 78, 216, 0.1);
+            --blue-glow:     rgba(29, 78, 216, 0.15);
+
+            --cyan:          #0891b2;
+            --cyan-muted:    rgba(8, 145, 178, 0.1);
+
+            --success:       #059669;
+            --success-bg:    rgba(5, 150, 105, 0.1);
+            --success-bdr:   rgba(5, 150, 105, 0.3);
+
+            --text:          #18181b;
+            --text-muted:    #52525b;
+            --text-subtle:   #71717a;
+
+            --sh-sm:   0 1px 3px rgba(0,0,0,.08);
+            --sh-md:   0 4px 12px rgba(0,0,0,.05);
+            --sh-lg:   0 10px 30px rgba(0,0,0,.08);
+            --sh-blue: 0 0 20px rgba(29, 78, 216, 0.15);
+            --sh-ok:   0 0 20px rgba(5, 150, 105, 0.15);
+
+            --r-sm:   8px;
+            --r-md:   14px;
+            --r-lg:   22px;
+            --r-xl:   30px;
+            --r-full: 9999px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Background glow */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 45% at 15% 8%,  rgba(29,78,216,.06)  0%, transparent 60%),
+                radial-gradient(ellipse 55% 35% at 85% 85%, rgba(8,145,178,.05) 0%, transparent 55%);
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: var(--r-full); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+        /* ─── Particles ─── */
+        #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .particle {
+            position: absolute; top: -5%; opacity: 0;
+            animation: drift linear forwards;
+        }
+        @keyframes drift {
+            0%   { opacity: 0;   transform: translateY(0) rotate(0deg); }
+            8%   { opacity: .55; }
+            92%  { opacity: .25; }
+            100% { opacity: 0;   transform: translateY(108vh) rotate(380deg); }
+        }
+
+        /* ─── Page wrapper ─── */
+        .page {
+            position: relative; z-index: 1;
+            max-width: 860px; margin: 0 auto;
+            padding: 52px 22px 100px;
+        }
+
+        /* ═══════════════════════════════════════════════
+            HEADER
+        ══════════════════════════════════════════════ */
+        .site-header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 36px 40px 34px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: rise .55s ease both;
+            box-shadow: var(--sh-sm);
+        }
+        .site-header::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--blue-deep), var(--blue), var(--cyan), var(--blue), var(--blue-deep));
+            background-size: 280% 100%;
+            animation: shimmer 5s linear infinite;
+        }
+        @keyframes shimmer { to { background-position: -280% 0; } }
+
+        /* faint background grid */
+        .site-header::after {
+            content: '';
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .header-inner {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 28px;
+            align-items: start;
+            position: relative; z-index: 1;
+        }
+
+        .header-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: .70rem; font-weight: 700; letter-spacing: .12em;
+            text-transform: uppercase; color: var(--blue);
+            background: var(--blue-muted);
+            border: 1px solid rgba(29,78,216,.2);
+            padding: 5px 14px; border-radius: var(--r-full);
+            margin-bottom: 14px;
+        }
+
+        .header-title {
+            font-family: 'Fraunces', serif;
+            font-size: 2.35rem; font-weight: 900;
+            line-height: 1.08; letter-spacing: -.025em;
+            color: var(--text); margin-bottom: 8px;
+        }
+
+        .header-sub {
+            font-size: .875rem; color: var(--text-muted);
+            margin-bottom: 22px; font-weight: 400;
+        }
+
+        .author-chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--surface-2); border: 1px solid var(--border);
+            padding: 7px 16px; border-radius: var(--r-full);
+            font-size: .82rem; font-weight: 600; color: var(--text-muted);
+            transition: .25s ease;
+        }
+        .author-chip:hover { border-color: var(--blue); color: var(--blue); background: var(--surface); }
+        .author-chip i { color: var(--blue); }
+
+        .header-right {
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 8px;
+            flex-shrink: 0; position: relative; z-index: 1;
+        }
+
+        .std-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .73rem; font-weight: 700; letter-spacing: .06em;
+            color: var(--cyan);
+            background: var(--cyan-muted);
+            border: 1px solid rgba(8,145,178,.22);
+            padding: 6px 14px; border-radius: var(--r-md);
+        }
+        .std-year { font-size: .72rem; color: var(--text-subtle); }
+
+        /* ═══════════════════════════════════════════════
+            PROGRESS BAR
+        ══════════════════════════════════════════════ */
+        .progress-bar-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 14px 22px;
+            box-shadow: var(--sh-sm);
+            margin-bottom: 32px;
+            animation: rise .65s ease .1s both;
+        }
+
+        .progress-label {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .progress-label span:first-child {
+            font-size: .82rem; font-weight: 600; color: var(--text-muted);
+        }
+        .progress-label span:last-child {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem; font-weight: 600; color: var(--blue);
+        }
+
+        .progress-track {
+            height: 10px; background: var(--surface-3);
+            border-radius: var(--r-full); overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue), var(--cyan));
+            border-radius: var(--r-full);
+            transition: width .6s cubic-bezier(.65,0,.35,1);
+            position: relative;
+        }
+        .progress-fill::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+            animation: shimmer-bar 2.5s linear infinite;
+        }
+        @keyframes shimmer-bar { to { transform: translateX(100%); } }
+
+        /* ═══════════════════════════════════════════════
+            FLOWCHART
+        ══════════════════════════════════════════════ */
+        @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .flowchart { position: relative; }
+
+        /* Nodes */
+        .main-node, .branch-node, .branch-section {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 24px 28px;
+            margin-bottom: 18px;
+            cursor: pointer;
+            transition: all .3s ease;
+            position: relative;
+            animation: rise .6s ease both;
+            box-shadow: var(--sh-sm);
+        }
+
+        .main-node.locked, .branch-node.locked, .branch-section.locked {
+            opacity: .45; cursor: not-allowed; filter: grayscale(0.6);
+        }
+
+        .main-node:not(.locked):hover, .branch-node:not(.locked):hover {
+            border-color: var(--blue);
+            box-shadow: var(--sh-blue);
+            transform: translateY(-3px);
+        }
+
+        .main-node.active-next, .branch-node.active-next {
+            border-color: var(--blue);
+            animation: pulse 2s ease infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(29,78,216,.4); }
+            50%      { box-shadow: 0 0 0 12px rgba(29,78,216,0); }
+        }
+
+        .main-node.completed, .branch-node.completed {
+            background: var(--success-bg);
+            border-color: var(--success-bdr);
+        }
+        .main-node.completed::before, .branch-node.completed::before {
+            content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: 16px; right: 20px;
+            color: var(--success); font-size: 1.1rem;
+        }
+
+        .node-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 8px;
+        }
+        .node-icon {
+            width: 42px; height: 42px;
+            background: var(--blue-muted);
+            border-radius: var(--r-md);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--blue); font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+        .node-title {
+            font-size: 1.05rem; font-weight: 700; color: var(--text);
+        }
+        .node-desc {
+            font-size: .85rem; color: var(--text-muted); line-height: 1.55;
+            margin-left: 54px;
+        }
+
+        /* Branch Section */
+        .branch-section {
+            background: var(--surface-2);
+            border: 2px dashed var(--border);
+            padding: 20px;
+            cursor: default;
+        }
+        .branch-section:hover { transform: none; box-shadow: var(--sh-sm); }
+        .branch-section.done-branch { background: rgba(5,150,105,.03); border-color: var(--success-bdr); }
+
+        .branch-label {
+            font-size: .70rem; font-weight: 700; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--blue);
+            background: var(--blue-muted);
+            border: 1px solid rgba(29,78,216,.2);
+            padding: 5px 12px; border-radius: var(--r-full);
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .branch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .branch-node { margin-bottom: 0; padding: 18px 20px; }
+        .branch-node .node-icon { width: 36px; height: 36px; font-size: 1rem; }
+        .branch-node .node-title { font-size: .95rem; }
+        .branch-node .node-desc { font-size: .80rem; margin-left: 46px; }
+
+        /* Connectors */
+        .connector {
+            width: 2px; height: 28px;
+            background: var(--border);
+            margin: 0 auto 18px;
+            position: relative;
+            transition: background .4s ease;
+        }
+        .connector::before {
+            content: ''; position: absolute; bottom: -6px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid var(--border);
+            transition: border-color .4s ease;
+        }
+        .connector.done { background: var(--success); }
+        .connector.done::before { border-top-color: var(--success); }
+
+        /* Start Button */
+        .start-section {
+            text-align: center;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 32px 28px;
+            margin-bottom: 18px;
+            animation: rise .6s ease both;
+            box-shadow: var(--sh-sm);
+        }
+        .start-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            border-radius: var(--r-full);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+            color: white; font-size: 1.8rem;
+        }
+        .start-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem; font-weight: 700; color: var(--text);
+            margin-bottom: 10px;
+        }
+        .start-desc {
+            font-size: .9rem; color: var(--text-muted); margin-bottom: 24px;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white; border: none;
+            padding: 14px 40px; border-radius: var(--r-full);
+            font-size: .95rem; font-weight: 700;
+            cursor: pointer; transition: .3s ease;
+            box-shadow: var(--sh-md);
+        }
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sh-blue);
+        }
+
+        /* ═══════════════════════════════════════════════
+            FOOTER
+        ══════════════════════════════════════════════ */
+        .site-footer {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 40px 44px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: rise .75s ease .2s both;
+            box-shadow: var(--sh-sm);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 36px;
+            margin-bottom: 32px;
+        }
+
+        .footer-section h4 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-section h4 i {
+            color: var(--blue);
+            font-size: .95rem;
+        }
+
+        .institution-item {
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .institution-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .institution-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: .92rem;
+            margin-bottom: 4px;
+        }
+
+        .institution-detail {
+            font-size: .80rem;
+            color: var(--text-subtle);
+            line-height: 1.5;
+        }
+
+        .analyst-info {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            border-radius: var(--r-md);
+        }
+
+        .analyst-name {
+            font-weight: 700;
+            color: var(--text);
+            font-size: .95rem;
+            margin-bottom: 6px;
+        }
+
+        .analyst-nim {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            color: var(--text-muted);
+            background: var(--surface);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .advisor-item {
+            margin-bottom: 14px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .advisor-item::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--blue);
+            font-size: .85rem;
+        }
+
+        .advisor-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .advisor-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: .88rem;
+        }
+
+        .advisor-role {
+            font-size: .78rem;
+            color: var(--text-subtle);
+            margin-top: 2px;
+        }
+
+        .footer-copyright {
+            text-align: center;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            font-size: .78rem;
+            color: var(--text-subtle);
+            line-height: 1.7;
+        }
+
+        .footer-copyright strong {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════
+            SIDE PANEL
+        ══════════════════════════════════════════════ */
+        .side-panel {
+            position: fixed; top: 0; right: -600px; bottom: 0;
+            width: 600px; max-width: 90vw;
+            background: var(--surface);
+            box-shadow: -8px 0 40px rgba(0,0,0,.12);
+            z-index: 1000;
+            transition: right .4s cubic-bezier(.65,0,.35,1);
+            display: flex; flex-direction: column;
+        }
+        .side-panel.open { right: 0; }
+
+        .panel-header {
+            padding: 28px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+            flex-shrink: 0;
+        }
+        .panel-title {
+            font-size: 1.25rem; font-weight: 700; color: var(--text);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .panel-title i { color: var(--blue); }
+
+        .panel-tabs {
+            display: flex; gap: 8px;
+        }
+        .ptab {
+            padding: 8px 18px; border-radius: var(--r-md);
+            font-size: .85rem; font-weight: 600;
+            background: transparent; color: var(--text-muted);
+            border: none; cursor: pointer;
+            transition: .25s ease;
+        }
+        .ptab.active {
+            background: var(--surface);
+            color: var(--blue);
+            box-shadow: var(--sh-sm);
+        }
+
+        .panel-body {
+            flex: 1; overflow-y: auto;
+            padding: 28px 32px;
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .panel-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 12px;
+            flex-shrink: 0;
+        }
+        .btn {
+            flex: 1; padding: 12px 24px;
+            border-radius: var(--r-md);
+            font-size: .9rem; font-weight: 600;
+            cursor: pointer; transition: .25s ease;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white;
+            box-shadow: var(--sh-sm);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sh-blue);
+        }
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .close-btn {
+            position: absolute; top: 28px; right: 28px;
+            width: 32px; height: 32px;
+            background: var(--surface-3);
+            border-radius: var(--r-md);
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            transition: .25s ease;
+        }
+        .close-btn:hover {
+            background: var(--blue-muted);
+            color: var(--blue);
+        }
+
+        .backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.4);
+            z-index: 999;
+            opacity: 0; pointer-events: none;
+            transition: opacity .3s ease;
+        }
+        .backdrop.open { opacity: 1; pointer-events: all; }
+
+        /* ═══════════════════════════════════════════════
+            CONTENT STYLES
+        ══════════════════════════════════════════════ */
+        .tab-pane h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.15rem; font-weight: 700;
+            color: var(--text); margin-bottom: 16px;
+        }
+        .tab-pane p {
+            font-size: .9rem; color: var(--text-muted);
+            line-height: 1.7; margin-bottom: 16px;
+        }
+        .tab-pane ul, .tab-pane ol {
+            margin: 16px 0; padding-left: 24px;
+        }
+        .tab-pane li {
+            font-size: .88rem; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 8px;
+        }
+        .tab-pane strong { color: var(--text); font-weight: 600; }
+
+        .step-ol {
+            list-style: none; padding: 0;
+            counter-reset: step;
+        }
+        .step-ol li {
+            position: relative; padding-left: 42px;
+            margin-bottom: 14px;
+        }
+        .sn {
+            position: absolute; left: 0; top: 2px;
+            width: 28px; height: 28px;
+            background: var(--blue-muted);
+            border-radius: var(--r-md);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--blue); font-weight: 700; font-size: .75rem;
+        }
+
+        .formula {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 16px 20px;
+            margin: 18px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .88rem;
+            color: var(--text);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .ib {
+            padding: 14px 18px;
+            border-radius: var(--r-md);
+            margin: 18px 0;
+            font-size: .85rem;
+            line-height: 1.7;
+        }
+        .ib.info {
+            background: var(--blue-muted);
+            border: 1px solid rgba(29,78,216,.2);
+            color: var(--text);
+        }
+        .ib.warn {
+            background: rgba(217,119,6,.1);
+            border: 1px solid rgba(217,119,6,.2);
+            color: var(--text);
+        }
+        .ib strong { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .ib i { color: var(--blue); }
+
+        .img-wrap {
+            border: 2px solid var(--border);
+            border-radius: var(--r-md);
+            overflow: hidden;
+            margin: 18px 0;
+        }
+        .img-wrap img {
+            width: 100%; display: block;
+        }
+        .img-cap {
+            padding: 12px 16px;
+            background: var(--surface-2);
+            font-size: .82rem; font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .calc-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 18px 20px;
+            margin: 18px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .85rem;
+            line-height: 2;
+            color: var(--text);
+        }
+        .calc-box div { margin-bottom: 6px; }
+
+        @media (max-width: 768px) {
+            .header-inner { grid-template-columns: 1fr; }
+            .header-right { align-items: flex-start; }
+            .branch-grid { grid-template-columns: 1fr; }
+            .side-panel { width: 100%; right: -100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="page">
+    <!-- ═══════════════════════════════════════════════
+        HEADER
+    ══════════════════════════════════════════════ -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div>
+                <div class="header-badge">
+                    <i class="fa-solid fa-atom"></i>
+                    SISTEM INTERAKTIF
+                </div>
+                <h1 class="header-title">Pengujian Kadar CaCO₃</h1>
+                <p class="header-sub">Prosedur lengkap pembuatan larutan, standarisasi, dan pengujian kadar kalsium karbonat</p>
+                <div class="author-chip">
+                    <i class="fa-solid fa-flask"></i>
+                    Laboratorium Kimia Analitik
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="std-pill">LAB-CHEM-2025</div>
+                <div class="std-year">Prosedur Standar</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════
+        PROGRESS BAR
+    ══════════════════════════════════════════════ -->
+    <div class="progress-bar-wrap">
+        <div class="progress-label">
+            <span>Progres Pengujian</span>
+            <span id="stepCounter">0 / 10</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div style="margin-top:10px;text-align:center;">
+            <span id="progressText" style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--blue)">0%</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+        FLOWCHART
+    ══════════════════════════════════════════════ -->
+    <div class="flowchart">
+
+        <!-- START -->
+        <div class="start-section" id="step-start">
+            <div class="start-icon">
+                <i class="fa-solid fa-play"></i>
+            </div>
+            <div class="start-title">Mulai Pengujian</div>
+            <div class="start-desc">Klik tombol di bawah untuk memulai prosedur pengujian kadar CaCO₃</div>
+            <button class="start-btn" onclick="handleStart()">
+                <i class="fa-solid fa-rocket"></i> Mulai Sekarang
+            </button>
+        </div>
+
+        <div class="connector" id="conn-start"></div>
+
+        <!-- STEP 0: Persiapan Dokumentasi -->
+        <div class="main-node locked" id="step-0" onclick="openPanel('step-0')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div class="node-title">Persiapan Dokumentasi</div>
+            </div>
+            <div class="node-desc">Mengisi lembar pengujian dengan biodata sampel, kondisi ruang, dan informasi analis</div>
+        </div>
+
+        <div class="connector" id="conn-0"></div>
+
+        <!-- STEP 1: BRANCH - Persiapan -->
+        <div class="branch-section locked" id="step-1-wrapper">
+            <div class="branch-label">
+                <i class="fa-solid fa-code-branch"></i>
+                Persiapan Pengujian
+            </div>
+            <div class="branch-grid">
+                <div class="branch-node locked" id="step-1a" onclick="openPanel('step-1a')">
+                    <div class="node-header">
+                        <div class="node-icon"><i class="fa-solid fa-vial"></i></div>
+                        <div class="node-title">Persiapan Bahan</div>
+                    </div>
+                    <div class="node-desc">Larutan HCl, NaOH, Indikator PP, dan sampel</div>
+                </div>
+                <div class="branch-node locked" id="step-1b" onclick="openPanel('step-1b')">
+                    <div class="node-header">
+                        <div class="node-icon"><i class="fa-solid fa-flask"></i></div>
+                        <div class="node-title">Persiapan Alat</div>
+                    </div>
+                    <div class="node-desc">Buret, pipet, erlenmeyer, dan peralatan laboratorium</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connector" id="conn-1"></div>
+
+        <!-- STEP 2: Pembuatan HCl 0,25 M -->
+        <div class="main-node locked" id="step-2" onclick="openPanel('step-2')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-droplet"></i></div>
+                <div class="node-title">Pembuatan Larutan HCl 0,25 M</div>
+            </div>
+            <div class="node-desc">Pengenceran larutan HCl pekat menjadi HCl 0,25 M</div>
+        </div>
+
+        <div class="connector" id="conn-2"></div>
+
+        <!-- STEP 3: Pembuatan NaOH 0,1 N -->
+        <div class="main-node locked" id="step-3" onclick="openPanel('step-3')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-flask-vial"></i></div>
+                <div class="node-title">Pembuatan Larutan NaOH 0,1 N</div>
+            </div>
+            <div class="node-desc">Pembuatan larutan basa standar dari padatan NaOH</div>
+        </div>
+
+        <div class="connector" id="conn-3"></div>
+
+        <!-- STEP 4: Pembuatan KHP 0,1 N -->
+        <div class="main-node locked" id="step-4" onclick="openPanel('step-4')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-prescription-bottle"></i></div>
+                <div class="node-title">Pembuatan Larutan KHP 0,1 N</div>
+            </div>
+            <div class="node-desc">Pembuatan larutan standar primer dari KHP padat</div>
+        </div>
+
+        <div class="connector" id="conn-4"></div>
+
+        <!-- STEP PP: Pembuatan Indikator PP 1% -->
+        <div class="main-node locked" id="step-pp" onclick="openPanel('step-pp')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-tint"></i></div>
+                <div class="node-title">Pembuatan Indikator PP 1%</div>
+            </div>
+            <div class="node-desc">Preparasi larutan indikator phenolphthalein untuk titrasi</div>
+        </div>
+
+        <div class="connector" id="conn-pp"></div>
+
+        <!-- STEP 5: Standarisasi NaOH -->
+        <div class="main-node locked" id="step-5" onclick="openPanel('step-5')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-eye-dropper"></i></div>
+                <div class="node-title">Standarisasi NaOH dengan KHP</div>
+            </div>
+            <div class="node-desc">Titrasi untuk menentukan konsentrasi NaOH yang sebenarnya</div>
+        </div>
+
+        <div class="connector" id="conn-5"></div>
+
+        <!-- STEP 6: Pengujian CaCO3 -->
+        <div class="main-node locked" id="step-6" onclick="openPanel('step-6')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-microscope"></i></div>
+                <div class="node-title">Pengujian Kadar CaCO₃</div>
+            </div>
+            <div class="node-desc">Prosedur titrasi untuk menentukan kadar kalsium karbonat dalam sampel</div>
+        </div>
+
+        <div class="connector" id="conn-6"></div>
+
+        <!-- STEP END: Hasil -->
+        <div class="main-node locked" id="step-end" onclick="openPanel('step-end')">
+            <div class="node-header">
+                <div class="node-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                <div class="node-title">Hasil Pengujian</div>
+            </div>
+            <div class="node-desc">Interpretasi hasil dan pelaporan kadar CaCO₃</div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+    FOOTER
+══════════════════════════════════════════════ -->
+<div class="page">
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <!-- Kolaborasi Institusi -->
+            <div class="footer-section">
+                <h4><i class="fa-solid fa-building-columns"></i> Kolaborasi Institusi</h4>
+                <div class="institution-item">
+                    <div class="institution-name">Universitas Negeri Surabaya</div>
+                    <div class="institution-detail">S1 Kimia, FMIPA</div>
+                </div>
+                <div class="institution-item">
+                    <div class="institution-name">Institut Teknologi Sepuluh Nopember</div>
+                    <div class="institution-detail">Lab. Energi & Lingkungan, Pusat Penelitian</div>
+                </div>
+            </div>
+
+            <!-- Analis Data -->
+            <div class="footer-section">
+                <h4><i class="fa-solid fa-user-graduate"></i> Analis Data</h4>
+                <div class="analyst-info">
+                    <div class="analyst-name">Dian Okti Sulistiowati</div>
+                    <div class="analyst-nim">NIM. 23030234099</div>
+                </div>
+            </div>
+
+            <!-- Dewan Pembimbing -->
+            <div class="footer-section">
+                <h4><i class="fa-solid fa-chalkboard-user"></i> Pembimbing</h4>
+                <div class="advisor-item">
+                    <div class="advisor-name">Dr. Amaria, M.Si.</div>
+                    <div class="advisor-role">Pembimbing Kampus — UNESA</div>
+                </div>
+                <div class="advisor-item">
+                    <div class="advisor-name">[Nama Pembimbing Lapangan]</div>
+                    <div class="advisor-role">Pembimbing Lapangan — ITS</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <strong>© 2026 Dian Okti Sulistiowati</strong><br>
+            Sistem Pengujian Kadar CaCO₃
+        </div>
+    </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+    SIDE PANEL
+══════════════════════════════════════════════ -->
+<div class="backdrop" id="backdrop" onclick="closePanel()"></div>
+<div class="side-panel" id="sidePanel">
+    <button class="close-btn" onclick="closePanel()">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="panel-header">
+        <div class="panel-title" id="panelTitle">
+            <i class="fa-solid fa-flask"></i> Judul Tahapan
+        </div>
+        <div class="panel-tabs">
+            <button class="ptab active" onclick="switchTab('teori', this)">
+                <i class="fa-solid fa-book"></i> Teori
+            </button>
+            <button class="ptab" onclick="switchTab('prosedur', this)">
+                <i class="fa-solid fa-list-check"></i> Prosedur
+            </button>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="tab-pane active" id="tab-teori">Konten teori...</div>
+        <div class="tab-pane" id="tab-prosedur">Konten prosedur...</div>
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-secondary" onclick="closePanel()">Tutup</button>
+        <button class="btn btn-primary" onclick="closePanel()">Selesai & Lanjut</button>
+    </div>
+</div>
+
+<script>
+/* ═══════════════════════════
+   DATABASE
+═══════════════════════════ */
+const DB = {
+    'step-0': {
+        icon: 'fa-clipboard-list', title: 'Persiapan Dokumentasi',
+        teori: `<h3>Dokumentasi Pengujian</h3>
+                <p>Sebelum memulai pengujian, dokumentasi yang lengkap dan akurat sangat penting untuk memastikan traceability dan validitas hasil pengujian.</p>
+                <div class="ib info"><strong><i class="fa-solid fa-circle-info"></i> Informasi yang Diperlukan:</strong><br>
+                • Kode sampel dan nama sampel<br>
+                • Jenis uji dan metode pengujian<br>
+                • Nama analis (3 inisial dari nama lengkap)<br>
+                • Tanggal mulai dan selesai pengujian<br>
+                • Kondisi lingkungan: suhu dan kelembaban ruang</div>`,
+        prosedur: `<h3>Langkah Pengisian Dokumentasi</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Siapkan lembar pengujian standar</li>
+                       <li><span class="sn">2</span>Isi biodata sampel dengan lengkap (kode, nama, jenis uji)</li>
+                       <li><span class="sn">3</span>Tulis inisial analis (3 huruf dari nama lengkap)<br>
+                           <small style="color:var(--text-subtle)">Contoh: Dian Okti Sulistiowati → DOS</small></li>
+                       <li><span class="sn">4</span>Catat tanggal mulai dan perkiraan tanggal selesai</li>
+                       <li><span class="sn">5</span>Ukur dan catat suhu serta kelembaban menggunakan thermo-hygrometer</li>
+                   </ol>`
+    },
+    'step-1a': {
+        icon: 'fa-vial', title: 'Persiapan Bahan',
+        teori: `<h3>Bahan-bahan yang Diperlukan</h3>
+                <p>Pastikan semua bahan kimia tersedia dalam kondisi baik dan tidak terkontaminasi.</p>`,
+        prosedur: `<h3>Daftar Bahan</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Larutan HCl 0,25 M (akan dibuat)</li>
+                       <li><span class="sn">2</span>Larutan NaOH 0,1 M (akan dibuat)</li>
+                       <li><span class="sn">3</span>Indikator Phenolphthalein (PP) 1%</li>
+                       <li><span class="sn">4</span>Larutan KHP 0,1 N (untuk standarisasi)</li>
+                       <li><span class="sn">5</span>Sampel yang akan diuji</li>
+                       <li><span class="sn">6</span>Aquades untuk pelarut dan pencucian</li>
+                   </ol>
+                   <div class="ib warn"><strong><i class="fa-solid fa-triangle-exclamation"></i> Catatan Keselamatan:</strong><br>
+                   Gunakan APD lengkap saat menangani bahan kimia. HCl dan NaOH bersifat korosif.</div>`
+    },
+    'step-1b': {
+        icon: 'fa-flask', title: 'Persiapan Alat',
+        teori: `<h3>Peralatan Laboratorium</h3>
+                <p>Pastikan semua peralatan dalam kondisi bersih dan kering sebelum digunakan.</p>`,
+        prosedur: `<h3>Daftar Alat</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Buret 50 mL dengan klem dan statif</li>
+                       <li><span class="sn">2</span>Pipet volumetrik 50 mL dan 10 mL</li>
+                       <li><span class="sn">3</span>Erlenmeyer 250 mL</li>
+                       <li><span class="sn">4</span>Labu ukur 100 mL dan 1000 mL</li>
+                       <li><span class="sn">5</span>Timbangan analitik</li>
+                       <li><span class="sn">6</span>Gelas beaker berbagai ukuran</li>
+                       <li><span class="sn">7</span>Spatula atau lab scoop</li>
+                       <li><span class="sn">8</span>Mortar dan alu (jika diperlukan)</li>
+                       <li><span class="sn">9</span>Hot plate</li>
+                   </ol>`
+    },
+    'step-2': {
+        icon: 'fa-droplet', title: 'Pembuatan Larutan HCl 0,25 M',
+        teori: `<h3>Prinsip Pengenceran</h3>
+                <p>HCl biasanya tersedia sebagai HCl pekat (~37% b/b, ≈ 12 M), sehingga perlu diencerkan untuk mendapatkan konsentrasi yang diinginkan.</p>
+                <h3>Perhitungan Molaritas HCl Pekat</h3>
+                <div class="formula">M = (ρ × % × 10) / Mr</div>
+                <p style="font-size:.85rem;color:var(--text-subtle);margin-top:-8px;">
+                    <strong>M</strong> = Molaritas (mol/L) &nbsp;·&nbsp; <strong>ρ</strong> = Massa Jenis (1,19 g/mL) &nbsp;·&nbsp; 
+                    <strong>%</strong> = Kadar (37%) &nbsp;·&nbsp; <strong>Mr</strong> = Molekul relatif HCl (36,5 g/mol)
+                </p>
+                <div class="calc-box">
+                    <div>M = (1,19 × 37 × 10) / 36,5</div>
+                    <div>M = 440,3 / 36,5</div>
+                    <div><strong>M ≈ 12,06 M</strong></div>
+                </div>
+
+                <h3>Rumus Pengenceran</h3>
+                <div class="formula">V₁ × M₁ = V₂ × M₂</div>
+                <div class="calc-box">
+                    <div>V₁ × 12,06 = 1000 × 0,25</div>
+                    <div>V₁ = 250 / 12,06</div>
+                    <div><strong>V₁ = 20,72 mL</strong></div>
+                </div>
+                
+                <h3>Pembuktian Molaritas HCl</h3>
+                <div class="formula">V₁ × M₁ = V₂ × M₂</div>
+                <div class="calc-box">
+                    <div>20,72 × 12,06 = 1000 × M₂</div>
+                    <div>M = 20,72 × 12,06 / 1000</div>
+                    <div><strong>M = 0,249 ≈ 0,25</strong></div>
+                </div>`,
+        prosedur: `<h3>Prosedur Pengenceran</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Siapkan labu ukur 1000 mL</li>
+                       <li><span class="sn">2</span>Isi labu dengan aquades sekitar 500 mL</li>
+                       <li><span class="sn">3</span>Ambil larutan HCl pekat sebanyak <strong>20,72 mL</strong> menggunakan pipet</li>
+                       <li><span class="sn">4</span>Masukkan HCl ke dalam labu ukur yang berisi air</li>
+                       <li><span class="sn">5</span>Homogenkan dengan memutar labu</li>
+                       <li><span class="sn">6</span>Tambahkan aquades hingga tanda batas</li>
+                       <li><span class="sn">7</span>Homogenkan kembali dengan membalik labu beberapa kali</li>
+                   </ol>
+                   <div class="ib warn"><strong><i class="fa-solid fa-triangle-exclamation"></i> Peringatan Keselamatan:</strong><br>
+                   SELALU tambahkan asam ke dalam air, BUKAN sebaliknya! Reaksi pengenceran HCl bersifat eksotermis.</div>`
+    },
+    'step-3': {
+        icon: 'fa-flask-vial', title: 'Pembuatan Larutan NaOH 0,1 N',
+        teori: `<h3>Prinsip Pembuatan</h3>
+                <p>NaOH berbentuk padatan, sehingga dibuat dengan cara menimbang langsung dan melarutkannya dalam air.</p>
+                <h3>Perhitungan Massa NaOH</h3>
+                <div class="formula">N = (gram × valensi) / (Mr × Volume)</div>
+                <p style="font-size:.85rem;color:var(--text-subtle);margin-top:-8px;">
+                    <strong>N</strong> = Normalitas &nbsp;·&nbsp; <strong>Mr NaOH</strong> = 40 g/mol &nbsp;·&nbsp; 
+                    <strong>Valensi</strong> = 1 &nbsp;·&nbsp; <strong>Volume</strong> = 1 L
+                </p>
+                <div class="calc-box">
+                    <div>0,1 = (gram × 1) / (40 × 1)</div>
+                    <div>gram = 40 × 0,1</div>
+                    <div><strong>gram = 4,0 g</strong></div>
+                </div>`,
+        prosedur: `<h3>Prosedur Pembuatan</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Timbang ±4,0 gram NaOH padat menggunakan timbangan analitik</li>
+                       <li><span class="sn">2</span>Larutkan dalam ±100 mL aquades di dalam gelas beaker</li>
+                       <li><span class="sn">3</span>Aduk hingga semua NaOH larut sempurna</li>
+                       <li><span class="sn">4</span>Pindahkan larutan ke labu ukur 1000 mL</li>
+                       <li><span class="sn">5</span>Bilas beaker 3× dengan aquades, masukkan air bilasan ke labu ukur</li>
+                       <li><span class="sn">6</span>Tambahkan aquades hingga tanda batas</li>
+                       <li><span class="sn">7</span>Homogenkan dengan membalik labu beberapa kali</li>
+                   </ol>
+                   <div class="ib info"><strong><i class="fa-solid fa-circle-info"></i> Catatan:</strong><br>
+                   NaOH bersifat higroskopis (menyerap air dari udara). Timbang dengan cepat dan tutup wadah rapat setelah pengambilan.</div>`
+    },
+    'step-4': {
+        icon: 'fa-prescription-bottle', title: 'Pembuatan Larutan KHP 0,1 N',
+        teori: `<h3>Prinsip Pembuatan</h3>
+                <p>KHP (Kalium Hidrogen Ptalat) adalah standar primer yang stabil dan digunakan untuk standarisasi larutan basa.</p>
+                <h3>Perhitungan Konsentrasi KHP</h3>
+                <div class="formula">N = gram / (Mr × Volume(L))</div>
+                <p style="font-size:.85rem;color:var(--text-subtle);margin-top:-8px;">
+                    <strong>Mr KHP</strong> = 204,22 g/mol &nbsp;·&nbsp; <strong>Volume</strong> = 100 mL = 0,1 L
+                </p>
+                <div class="calc-box">
+                    <div>N = 2,000 / (204,22 × 0,1)</div>
+                    <div>N = 2,000 / 20,422</div>
+                    <div><strong>N ≈ 0,0979 ≈ 0,1 N</strong></div>
+                </div>`,
+        prosedur: `<h3>Prosedur Pembuatan</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Timbang ±2,0 gram KHP menggunakan timbangan analitik</li>
+                       <li><span class="sn">2</span>Larutkan dalam ±50 mL aquades di dalam gelas beaker</li>
+                       <li><span class="sn">3</span>Aduk hingga semua KHP larut sempurna</li>
+                       <li><span class="sn">4</span>Pindahkan larutan ke labu ukur 100 mL</li>
+                       <li><span class="sn">5</span>Bilas beaker 3× dengan aquades, masukkan air bilasan ke labu ukur</li>
+                       <li><span class="sn">6</span>Tambahkan aquades hingga tanda batas</li>
+                       <li><span class="sn">7</span>Homogenkan dengan membalik labu beberapa kali</li>
+                   </ol>`
+    },
+    'step-pp': {
+        icon: 'fa-tint', title: 'Pembuatan Indikator PP 1%',
+        teori: `<h3>Tentang Indikator Phenolphthalein (PP)</h3>
+                <p>Phenolphthalein adalah indikator asam-basa yang berubah warna dari tidak berwarna (pH < 8,2) menjadi pink/merah muda (pH > 10) pada titik ekivalen titrasi asam-basa.</p>
+                <div class="ib warn"><strong><i class="fa-solid fa-triangle-exclamation"></i> Sifat Penting PP:</strong><br>
+                PP tidak larut dalam air, sehingga perlu dilarutkan dalam ethanol terlebih dahulu sebelum ditambahkan air.</div>`,
+        prosedur: `<h3>Prosedur Pembuatan</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Timbang PP sebanyak <strong>0,5 gram</strong> menggunakan kaca arloji</li>
+                       <li><span class="sn">2</span>Masukkan ke dalam beaker glass</li>
+                       <li><span class="sn">3</span>Larutkan dengan <strong>25 mL ethanol</strong></li>
+                       <li><span class="sn">4</span>Homogenkan dengan batang pengaduk hingga jernih dan tidak ada endapan</li>
+                       <li><span class="sn">5</span>Tambahkan <strong>25 mL aquadest</strong></li>
+                       <li><span class="sn">6</span>Homogenkan kembali</li>
+                   </ol>
+                   <div class="ib info"><strong><i class="fa-solid fa-circle-info"></i> Penyimpanan:</strong><br>
+                   Simpan dalam botol gelap dan tutup rapat. Indikator PP stabil selama beberapa bulan jika disimpan dengan baik.</div>`
+    },
+    'step-5': {
+        icon: 'fa-eye-dropper', title: 'Standarisasi NaOH dengan KHP',
+        teori: `<h3>Tujuan Standarisasi</h3>
+                <p>Standarisasi dilakukan untuk menentukan konsentrasi NaOH yang sebenarnya, karena NaOH mudah menyerap CO₂ dan H₂O dari udara.</p>
+                <h3>Reaksi Kimia</h3>
+                <div class="formula">KHP + NaOH → NaKP + H₂O</div>
+                <h3>Perhitungan</h3>
+                <div class="formula">V₁ × M₁ = V₂ × M₂</div>
+                <p style="font-size:.85rem;color:var(--text-subtle);">
+                    V₁ = Volume KHP (mL) &nbsp;·&nbsp; M₁ = Normalitas KHP (0,1 N)<br>
+                    V₂ = Volume NaOH (mL) &nbsp;·&nbsp; M₂ = Normalitas NaOH (dihitung)
+                </p>`,
+        prosedur: `<h3>Prosedur Titrasi</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Ambil larutan KHP sebanyak <strong>25 mL</strong> dengan pipet volumetrik</li>
+                       <li><span class="sn">2</span>Masukkan ke dalam Erlenmeyer</li>
+                       <li><span class="sn">3</span>Tambahkan <strong>5 tetes</strong> indikator PP 1%</li>
+                       <li><span class="sn">4</span>Titrasi dengan NaOH hingga larutan berwarna <strong>pink</strong> muda</li>
+                       <li><span class="sn">5</span>Catat volume NaOH yang digunakan</li>
+                       <li><span class="sn">6</span>Ulangi titrasi secara duplo (2 kali pengulangan)</li>
+                       <li><span class="sn">7</span>Hitung normalitas NaOH dari setiap pengulangan</li>
+                       <li><span class="sn">8</span>Ambil rata-rata dari hasil duplo</li>
+                   </ol>
+                   <div class="ib info"><strong><i class="fa-solid fa-circle-info"></i> Titik Akhir Titrasi:</strong><br>
+                   Warna pink muda yang stabil selama minimal 30 detik menandakan titik ekivalen tercapai.</div>`
+    },
+    'step-6': {
+        icon: 'fa-microscope', title: 'Pengujian Kadar CaCO₃',
+        teori: `<h3>Prinsip Pengujian</h3>
+                <p>Kadar CaCO₃ ditentukan melalui titrasi asam-basa (titrasi balik/back titration). Sampel yang mengandung CaCO₃ direaksikan dengan HCl berlebih, kemudian kelebihan HCl dititrasi dengan NaOH.</p>
+                <h3>Reaksi Kimia</h3>
+                <div class="formula">CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑</div>
+                <div class="formula">HCl (sisa) + NaOH → NaCl + H₂O</div>
+                
+                <h3>Perhitungan Mol HCl yang Ditambahkan</h3>
+                <div class="calc-box">
+                    <div>50,00 mL HCl × (1 L / 1000 mL) × 0,250 mol HCl/L</div>
+                    <div><strong>= 1,25 × 10⁻² mol</strong></div>
+                </div>
+                
+                <h3>Perhitungan Mol HCl yang Tidak Bereaksi</h3>
+                <p style="font-size:.85rem;color:var(--text-subtle);">Dari hasil titrasi balik dengan NaOH:</p>
+                <div class="calc-box">
+                    <div>28,09 mL NaOH × (1 L / 1000 mL) × 0,104 mol NaOH/L × (1 mol HCl / 1 mol NaOH)</div>
+                    <div><strong>= 2,92 × 10⁻³ mol</strong></div>
+                </div>
+                
+                <h3>Perhitungan Mol CaCO₃</h3>
+                <div class="calc-box">
+                    <div>(1,25 × 10⁻² mol HCl ditambahkan) - (2,92 × 10⁻³ mol HCl tidak bereaksi)</div>
+                    <div>× (1 mol CaCO₃ / 2 mol HCl)</div>
+                    <div><strong>= 4,79 × 10⁻³ mol CaCO₃</strong></div>
+                </div>
+                
+                <h3>Perhitungan Persen Massa CaCO₃</h3>
+                <div class="calc-box">
+                    <div>(4,79 × 10⁻³ mol CaCO₃ × 100,09 g CaCO₃/mol) / 0,504 g sampel × 100</div>
+                    <div><strong>= 95,1% massa CaCO₃</strong></div>
+                </div>`,
+        prosedur: `<h3>A. Preparasi Sampel</h3>
+                   <div class="ib info"><strong><i class="fa-solid fa-circle-info"></i> Catatan:</strong><br>
+                   Jika sampel berbentuk padatan keping batu kapur, sampel harus dihaluskan menggunakan mortar dan alu hingga menjadi serbuk halus.</div>
+                   
+                   <h3>B. Prosedur Persiapan Sampel</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Timbang sampel sebanyak <strong>0,5 gram ± 0,01</strong></li>
+                       <li><span class="sn">2</span>Catat massa sampel dengan teliti</li>
+                       <li><span class="sn">3</span>Masukkan sampel ke dalam labu Erlenmeyer</li>
+                       <li><span class="sn">4</span>Pipet <strong>50 mL</strong> larutan HCl 0,25 M menggunakan pipet volume</li>
+                       <li><span class="sn">5</span>Masukkan ke dalam labu Erlenmeyer yang berisi sampel</li>
+                       <li><span class="sn">6</span>Catat volume dan molaritas HCl yang digunakan</li>
+                       <li><span class="sn">7</span>Panaskan dengan hot plate sampai gelembung CO₂ hilang</li>
+                       <li><span class="sn">8</span>Dinginkan larutan hingga suhu ruang</li>
+                   </ol>
+                   
+                   <div class="ib warn"><strong><i class="fa-solid fa-triangle-exclamation"></i> Peringatan Penting:</strong><br>
+                   • Ketika dipanaskan jangan sampai mendidih<br>
+                   • Konsistensi sampel seperti "nyemek" (tidak basah namun juga tidak kering)<br>
+                   • Reaksi selesai ditandai dengan berhentinya gelembung CO₂</div>
+                   
+                   <h3>C. Titrasi Sisa HCl (Back Titration)</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Tambahkan <strong>3 tetes</strong> indikator PP 1% ke dalam larutan</li>
+                       <li><span class="sn">2</span>Titrasi dengan larutan NaOH standar 0,1 M</li>
+                       <li><span class="sn">3</span>Hentikan titrasi saat muncul warna <strong>pink</strong> pertama dan tidak hilang selama 10 detik</li>
+                       <li><span class="sn">4</span>Catat volume NaOH yang dibutuhkan</li>
+                       <li><span class="sn">5</span>Hitung mol HCl yang tidak bereaksi</li>
+                       <li><span class="sn">6</span>Ulangi pengujian secara duplo</li>
+                       <li><span class="sn">7</span>Hitung kadar CaCO₃ dari setiap pengulangan</li>
+                   </ol>
+                   
+                   <div class="ib info"><strong><i class="fa-solid fa-circle-check"></i> Perhitungan:</strong><br>
+                   Gunakan rumus di tab Teori untuk menghitung mol HCl yang bereaksi, mol CaCO₃, dan persen massa CaCO₃.</div>`
+    },
+    'step-end': {
+        icon: 'fa-flag-checkered', title: 'Hasil Pengujian',
+        teori: `<h3>Interpretasi Hasil</h3>
+                <p>Hasil pengujian kadar CaCO₃ dilaporkan dalam persen (%) dengan memperhitungkan massa sampel dan volume pereaksi yang digunakan.</p>
+                <h3>Kriteria Penerimaan</h3>
+                <div class="ib info"><strong><i class="fa-solid fa-circle-check"></i> Validitas Hasil:</strong><br>
+                • Hasil duplo harus memiliki selisih < 2% (repeatability)<br>
+                • Blanko harus dilakukan untuk koreksi<br>
+                • Catat semua data pengamatan dengan lengkap</div>
+                <h3>Pelaporan</h3>
+                <p style="font-size:.88rem;line-height:1.8;color:var(--text-muted);">
+                    Laporkan hasil sebagai rata-rata dari duplo beserta standar deviasi. Bandingkan dengan spesifikasi yang ditentukan.
+                </p>`,
+        prosedur: `<h3>Langkah Akhir</h3>
+                   <ol class="step-ol">
+                       <li><span class="sn">1</span>Hitung kadar CaCO₃ dari setiap pengulangan</li>
+                       <li><span class="sn">2</span>Hitung rata-rata dan standar deviasi</li>
+                       <li><span class="sn">3</span>Verifikasi bahwa selisih hasil duplo < 2%</li>
+                       <li><span class="sn">4</span>Lengkapi lembar pengujian dengan hasil perhitungan</li>
+                       <li><span class="sn">5</span>Buat laporan hasil pengujian</li>
+                       <li><span class="sn">6</span>Bandingkan dengan spesifikasi produk</li>
+                   </ol>
+                   <div class="img-wrap" style="border-color:var(--success-bdr)">
+                       <img src="https://placehold.co/600x280/f8f8f9/059669?text=Laporan+Hasil+Pengujian" alt="Laporan">
+                       <div class="img-cap" style="color:var(--success)">Contoh Format Laporan Hasil Pengujian CaCO₃</div>
+                   </div>`
+    }
+};
+
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+let activeNodeId = null;
+
+/* ═══════════════════════════
+   PARTICLES
+═══════════════════════════ */
+(function initParticles() {
+    const box = document.getElementById('particles');
+    const ic  = ['fa-flask','fa-atom','fa-droplet','fa-vial','fa-microscope'];
+    const cl  = ['rgba(29,78,216,.2)','rgba(8,145,178,.2)','rgba(5,150,105,.15)'];
+    setInterval(() => {
+        const el = document.createElement('i');
+        el.className = `fa-solid ${ic[Math.floor(Math.random()*ic.length)]} particle`;
+        el.style.cssText = `left:${Math.random()*100}vw;font-size:${Math.random()*7+5}px;color:${cl[Math.floor(Math.random()*cl.length)]};animation-duration:${Math.random()*9+9}s`;
+        box.appendChild(el);
+        setTimeout(() => el.remove(), 18000);
+    }, 700);
+})();
+
+/* ═══════════════════════════
+   TABS
+═══════════════════════════ */
+function switchTab(tab, btn) {
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+/* ═══════════════════════════
+   MARK COMPLETED
+═══════════════════════════ */
+function markDone(id) {
+    const el = document.getElementById(id);
+    if (!el || el.classList.contains('completed')) return;
+    el.classList.add('completed');
+    el.classList.remove('active-next');
+    updateProgress();
+    refreshConnectors();
+}
+
+/* ═══════════════════════════
+   START BUTTON
+═══════════════════════════ */
+function handleStart() {
+    unlockStep('step-0', 'step-start');
+}
+
+/* ═══════════════════════════
+   UNLOCK STEP
+═══════════════════════════ */
+function unlockStep(targetId, currentId) {
+    if (currentId) markDone(currentId);
+
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    target.classList.remove('locked');
+
+    if (target.classList.contains('branch-section')) {
+        target.querySelectorAll('.branch-node').forEach(n => {
+            n.classList.remove('locked');
+            n.classList.add('active-next');
+        });
+    } else {
+        target.classList.add('active-next');
+    }
+
+    setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    updateProgress();
+    refreshConnectors();
+}
+
+/* ═══════════════════════════
+   OPEN PANEL
+═══════════════════════════ */
+function openPanel(id) {
+    const el = document.getElementById(id);
+    if (!el || el.classList.contains('locked')) return;
+
+    const data = DB[id];
+    if (!data) return;
+
+    document.getElementById('panelTitle').innerHTML = `<i class="fa-solid ${data.icon}"></i> ${data.title}`;
+    document.getElementById('tab-teori').innerHTML = data.teori;
+    document.getElementById('tab-prosedur').innerHTML = data.prosedur || '<p style="color:var(--text-subtle);text-align:center;padding:40px 0">Tidak ada prosedur tambahan untuk tahap ini.</p>';
+
+    document.querySelectorAll('.ptab').forEach((b,i)  => b.classList.toggle('active', i===0));
+    document.querySelectorAll('.tab-pane').forEach((p,i) => p.classList.toggle('active', i===0));
+
+    document.getElementById('sidePanel').classList.add('open');
+    document.getElementById('backdrop').classList.add('open');
+
+    activeNodeId = id;
+}
+
+/* ═══════════════════════════
+   CLOSE PANEL
+═══════════════════════════ */
+function closePanel() {
+    document.getElementById('sidePanel').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('open');
+
+    if (activeNodeId) {
+        markDone(activeNodeId);
+
+        // Branch 1: both done → unlock step-2
+        if (['step-1a','step-1b'].includes(activeNodeId)) {
+            if (['step-1a','step-1b'].every(id => document.getElementById(id).classList.contains('completed'))) {
+                document.getElementById('step-1-wrapper').classList.add('done-branch');
+                unlockStep('step-2');
+            }
+        }
+        // Regular progression
+        else if (activeNodeId === 'step-0') unlockStep('step-1-wrapper');
+        else if (activeNodeId === 'step-2') unlockStep('step-3');
+        else if (activeNodeId === 'step-3') unlockStep('step-4');
+        else if (activeNodeId === 'step-4') unlockStep('step-pp');
+        else if (activeNodeId === 'step-pp') unlockStep('step-5');
+        else if (activeNodeId === 'step-5') unlockStep('step-6');
+        else if (activeNodeId === 'step-6') unlockStep('step-end');
+
+        activeNodeId = null;
+    }
+
+    refreshConnectors();
+    updateProgress();
+}
+
+/* ═══════════════════════════
+   REFRESH CONNECTORS
+═══════════════════════════ */
+function refreshConnectors() {
+    const map = [
+        { node: 'step-start',     conn: 'conn-start' },
+        { node: 'step-0',         conn: 'conn-0' },
+        { node: 'step-1-wrapper', conn: 'conn-1', branch: true, ids: ['step-1a','step-1b'] },
+        { node: 'step-2',         conn: 'conn-2' },
+        { node: 'step-3',         conn: 'conn-3' },
+        { node: 'step-4',         conn: 'conn-4' },
+        { node: 'step-pp',        conn: 'conn-pp' },
+        { node: 'step-5',         conn: 'conn-5' },
+        { node: 'step-6',         conn: 'conn-6' },
+    ];
+    map.forEach(({ node, conn, branch, ids }) => {
+        const connEl = document.getElementById(conn);
+        if (!connEl) return;
+        const done = branch
+            ? ids.every(id => document.getElementById(id).classList.contains('completed'))
+            : document.getElementById(node).classList.contains('completed');
+        connEl.classList.toggle('done', done);
+    });
+}
+
+/* ═══════════════════════════
+   PROGRESS
+═══════════════════════════ */
+function updateProgress() {
+    const total = document.querySelectorAll('.main-node, .branch-node').length + 1; // +1 for start
+    const done  = document.querySelectorAll('.main-node.completed, .branch-node.completed').length + 
+                  (document.getElementById('step-start').classList.contains('completed') ? 1 : 0);
+    const pct   = Math.round(done / total * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '%';
+    document.getElementById('stepCounter').textContent  = `${done} / ${total}`;
+}
+</script>
+</body>
+</html>
